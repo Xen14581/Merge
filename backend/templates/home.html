@@ -6,6 +6,9 @@
 
 {% if user.is_authenticated %}
 <p>Welcome {{ user.username }} !!!</p>
+<script>
+    window.location.replace("http://localhost:3000")
+</script>
 {% else %}
 <a href="{% provider_login_url 'github' %}">
     <button class="btn">

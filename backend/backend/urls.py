@@ -21,12 +21,12 @@ from merge.views import *
 
 router = routers.DefaultRouter()
 router.register(r'todos', TodoView, 'todo')
+router.register(r'user', UserView, 'user')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', Home.as_view(), name='home'),
-    path('token', get_token, name='token'),
-    path('user', get_user, name='user'),
     path('api/', include(router.urls)),
+    path('repo/', include('merge.urls')),
 ]
