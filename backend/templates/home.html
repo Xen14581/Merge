@@ -1,0 +1,16 @@
+{% load socialaccount %}
+{% load static %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="{% static 'css/home.css' %}" rel="stylesheet"/>
+
+{% if user.is_authenticated %}
+<p>Welcome {{ user.username }} !!!</p>
+{% else %}
+<a href="{% provider_login_url 'github' %}">
+    <button class="btn">
+        <img class="github-icon" src="{% static 'img/Github-Mark-64px.png' %}"/>
+        <p>Login with Github</p>
+    </button>
+</a>
+{% endif %}

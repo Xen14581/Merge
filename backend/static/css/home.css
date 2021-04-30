@@ -1,0 +1,25 @@
+body {
+	background-image: url("../img/Merge_Background_art.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.btn {
+    position: relative;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 6px 32px;
+    font-size: 22px;
+    text-align: center;
+    background-color: light-grey;
+    transition-duration: 0.4s;
+    display: flex;
+    alignment-items: center;
+    justify-content: centre;
+    top: 73%;
+    left: 43%;
+}
+
+.btn:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
