@@ -3,8 +3,10 @@ from django.shortcuts import render, HttpResponse
 from django.views.generic import TemplateView
 
 from allauth.socialaccount.models import SocialToken
+from rest_framework import viewsets
 
-# from .models import *
+from .serializers import TodoSerializer
+from .models import Todo
 
 # Create your views here.
 
@@ -12,6 +14,10 @@ from allauth.socialaccount.models import SocialToken
 class Home(TemplateView):
     template_name = 'home.html'
 
+
+class TodoView(viewsets.ModelViewSet):
+    serializer_class = TodoSerializer
+    queryset = Todo.objects.all()
 
 # This is how you get the OAuth token
 # Helper function

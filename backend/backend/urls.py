@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
 
 from merge.views import *
+
+router = routers.DefaultRouter()
+router.register(r'todos', TodoView, 'todo')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +28,5 @@ urlpatterns = [
     path('', Home.as_view(), name='home'),
     path('token', get_token, name='token'),
     path('user', get_user, name='user'),
+    path('api/', include(router.urls)),
 ]
