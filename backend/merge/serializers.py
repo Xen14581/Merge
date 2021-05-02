@@ -15,12 +15,12 @@ class TodoSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email')
+        # fields = ('id', 'username', 'first_name', 'last_name', 'email', 'profile')
+        fields = '__all__'
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     merge_password = serializers.CharField(
-        write_only=True,
         style={'input_type': 'password'}
     )
 
