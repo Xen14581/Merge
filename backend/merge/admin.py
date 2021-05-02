@@ -3,9 +3,9 @@ from .models import Todo
 
 # Register your models here.
 
-
-class TodoAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'completed')
-
-
-admin.site.register(Todo, TodoAdmin)
+#
+# class TodoAdmin(admin.ModelAdmin):
+#     list_display = ('title', 'completed', 'repo', 'assigned_merge_user', 'deadline')
+#
+#
+# admin.site.register(Todo, TodoAdmin)

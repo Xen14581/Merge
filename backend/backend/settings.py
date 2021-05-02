@@ -161,10 +161,10 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-ALLOWED_HOSTS = [ "*"
-    # 'localhost',
-    # '127.0.0.1',
-    # '192.168.1.5',
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '192.168.1.5',
 ]
 
 # CORS_ORIGIN_ALLOW_ALL = True
@@ -201,3 +201,9 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}

@@ -15,18 +15,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
 from rest_framework import routers
+from rest_framework_simplejwt import views as jwt_views
 
 from merge.views import *
 
 router = routers.DefaultRouter()
 router.register(r'todos', TodoView, 'todo')
 router.register(r'user', UserView, 'user')
+router.register(r'profile', ProfileView, 'profile')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', Home.as_view(), name='home'),
+    path('token/', get_token, name='token'),
+    path('user/', get_user, name='user'),
     path('api/', include(router.urls)),
     path('repo/', include('merge.urls')),
+    path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 ]
