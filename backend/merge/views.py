@@ -1,5 +1,6 @@
 import requests
 from django.http import JsonResponse
+from django.core import serializers as s
 from django.shortcuts import render, HttpResponse
 from django.views import View
 from django.views.generic import TemplateView
@@ -8,6 +9,9 @@ from django.views.generic import TemplateView
 from allauth.socialaccount.models import SocialToken, SocialAccount
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import *
 from .models import *
@@ -23,6 +27,13 @@ class TodoView(viewsets.ModelViewSet):
     serializer_class = TodoSerializer
     queryset = Todo.objects.all()
 
+    def put(self, request, pk, format=None):
+        todo = self.get_object(pk)
+        serializer = TodoSerializer(todo, request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
@@ -41,18 +52,24 @@ class ProfileView(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
 # deprecated
 # This is how you get the OAuth token
 # Helper function
-def get_token(request):
-    user = request.user
-    print(request.data)
-    result = SocialToken.objects.filter(account__user=user, account__provider="github")
-    return result.first()
+# def get_oauthtoken(request):
+#     user = request.user
+#     print(request.data)
+#     result = SocialToken.objects.filter(account__user=user, account__provider="github")
+#     return result.first()
+
 
 # deprecated
 def get_user(request):
-    # token = get_token(request)
+    # token = get_oauthtoken(request)
     # # print(str(token))
     # headers = {'Authorization': 'token ' + str(token)}
     # req = requests.get("https://api.github.com/user", headers=headers)
@@ -61,6 +78,7 @@ def get_user(request):
     users = SocialAccount.objects.values_list("extra_data")
     return JsonResponse(users.first()[0], safe=False)
 
+
 # Function to check if a path works
 def hello(request):
     return HttpResponse('Hello')
@@ -68,4 +86,4 @@ def hello(request):
 
 def repos(request, username):
     response = requests.get(f'https://api.github.com/users/{username}/repos')
-    return JsonResponse(response.json()[:], safe=False)
+    return JsonResponse(response.json(), safe=False)
