@@ -1,9 +1,9 @@
 import collections
 import json
-import datetime as dt
 
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.forms.models import model_to_dict
 
 from rest_framework import exceptions
 from rest_framework import serializers
@@ -19,10 +19,6 @@ class TodoSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        read_only=True
-    )
-
     class Meta:
         model = User
         fields = ('id', 'username', 'profile')
@@ -77,5 +73,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             custom_attrs = dict(attrs)
             custom_attrs['username'] = profile
             attrs = collections.OrderedDict(custom_attrs)
-            print(attrs)
-            return super().validate(attrs)
+            data = super().validate(attrs)
+            data['user'] = model_to_dict(profile)
+            return data

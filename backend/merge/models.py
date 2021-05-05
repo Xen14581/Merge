@@ -41,6 +41,9 @@ class MergeProfile(models.Model):
 
 @receiver(post_save, sender=User)
 def update_password(sender, instance, **kwargs):
-    if instance.password != instance.profile.merge_password:
-        instance.password = instance.profile.merge_password
-        instance.save()
+    try:
+        if instance.password != instance.profile.merge_password:
+            instance.password = instance.profile.merge_password
+            instance.save()
+    except:
+        pass
