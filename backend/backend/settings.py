@@ -154,6 +154,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'user',
             'repo',
             'read:org',
+            'delete_repo',
         ],
         'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
         'INIT_PARAMS': {'cookie': True},

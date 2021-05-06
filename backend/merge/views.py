@@ -127,9 +127,19 @@ def get_user_repos(request):
 
 @api_view(['POST', ])
 def create_repo(request):
-    pass
+    token = get_oauthtoken(request)
+    repo_name = request.data['repo_name']
+    headers = {'Authorization': 'token ' + str(token)}
+    data = {"name": repo_name}
+    req = requests.post("https://api.github.com/user/repos", headers=headers, data=json.dumps(data))
+    return Response(json.dumps(json.loads(req.text)))
 
 
 @api_view(['POST', ])
 def delete_repo(request):
-    pass
+    token = get_oauthtoken(request)
+    username = request.data['username']
+    repo_name = request.data['repo_name']
+    headers = {'Authorization': 'token ' + str(token)}
+    req = requests.delete(f"https://api.github.com/repos/{username}/{repo_name}", headers=headers)
+    return Response(req)
