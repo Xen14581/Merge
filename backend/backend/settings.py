@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 
     'merge',
     'backend',
+    'chats',
 
     'allauth',
     'allauth.account',
@@ -45,10 +46,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'corsheaders',
     'rest_framework',
+    'channels'
 
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
@@ -79,6 +82,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+ASGI_APPLICATION = 'backend.asgi.application'
 
 
 # Database
@@ -207,4 +212,13 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 }

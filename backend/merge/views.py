@@ -1,5 +1,4 @@
 import requests
-from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 from django.views.generic import TemplateView
 
@@ -12,7 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import *
 from .models import *
-
+from chats.models import RepoChats
 
 '''Class Based Views Section'''
 
@@ -98,7 +97,6 @@ def get_user(request):
 @api_view(['POST', ])
 def get_user_repos(request):
     token = get_oauthtoken(request)
-    username = request.data['username']
     headers = {'Authorization': 'token ' + str(token)}
     query = '''
     {
@@ -132,6 +130,11 @@ def create_repo(request):
     headers = {'Authorization': 'token ' + str(token)}
     data = {"name": repo_name}
     req = requests.post("https://api.github.com/user/repos", headers=headers, data=json.dumps(data))
+    collaborators = [{request.data['username']: 'owner'}]
+    chat = RepoChats()
+    chat.repo_name = repo_name
+    chat.collaborators = collaborators
+    chat.save()
     return Response(json.dumps(json.loads(req.text)))
 
 

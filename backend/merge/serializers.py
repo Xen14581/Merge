@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'profile')
-        # fields = '__all__'
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -35,9 +34,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'merge_username', 'merge_password')
 
     def create(self, validated_data):
-        print(validated_data['merge_password'])
         validated_data['merge_password'] = make_password(validated_data.get('merge_password'))
-        print(validated_data['merge_password'])
         return super(ProfileSerializer, self).create(validated_data)
 
 
