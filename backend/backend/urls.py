@@ -37,4 +37,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('repo/', include('merge.urls')),
     path('chat/', include('chats.api.urls', namespace='chat')),
+    path('chpw/', change_password, name='change password'),
 ]

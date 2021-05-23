@@ -67,6 +67,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             profile = User.objects.get(
                 profile__merge_username=request_data.get("username")
             )
+            profile.save()
             custom_attrs = dict(attrs)
             custom_attrs['username'] = profile
             attrs = collections.OrderedDict(custom_attrs)

@@ -74,35 +74,33 @@ def create_chats(sender, instance, **kwargs):
     }
     '''
     req = run_query(query=query, headers=headers)
-    print(req)
-    for repo in req['data']['viewer']['repositories']['nodes']:
-        repo_name = repo['name']
-        repo_owner = repo['owner']['login']
-        collaborators = repo['collaborators']['nodes']
-        print(repo_name,repo_owner,collaborators)
-        try:
-            user = get_object_or_404(User, username=repo_owner)
-            print(user)
-            repo_owner = get_object_or_404(Contact, user=user)
-            print(user, repo_owner)
-
-            collaborator_list = []
-            for collaborator in collaborators:
-                username = collaborator['login']
-                print(username)
-                if str(username) == str(repo_owner):
-                    collaborator_list.append({str(repo_owner): 'owner'})
-                else:
-                    collaborator_list.append({collaborator['login']: 'collaborator'})
-            print(collaborator_list)
+    try:
+        for repo in req['data']['viewer']['repositories']['nodes']:
+            repo_name = repo['name']
+            repo_owner = repo['owner']['login']
+            collaborators = repo['collaborators']['nodes']
             try:
-                RepoChats.objects.get(repo_name=repo_name, collaborators=collaborator_list)
+                user = get_object_or_404(User, username=repo_owner)
+                repo_owner = get_object_or_404(Contact, user=user)
 
+                collaborator_list = []
+                for collaborator in collaborators:
+                    username = collaborator['login']
+                    if str(username) == str(repo_owner):
+                        collaborator_list.append({str(repo_owner): 'owner'})
+                    else:
+                        collaborator_list.append({collaborator['login']: 'collaborator'})
+                try:
+                    RepoChats.objects.get(repo_name=repo_name, collaborators=collaborator_list)
+
+                except:
+                    chat = RepoChats()
+                    chat.repo_name = repo_name
+                    chat.save()
+                    chat.collaborators = collaborator_list
+                    chat.save()
             except:
-                chat = RepoChats()
-                chat.repo_name = repo_name
-                chat.save()
-                chat.collaborators = collaborator_list
-                chat.save()
-        except:
-            print('Owner of the  repo is not on Merge')
+                print('Owner of the  repo is not on Merge')
+                pass
+    except:
+        print('No personal repos')

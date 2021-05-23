@@ -13,6 +13,32 @@ from .serializers import *
 from .models import *
 from chats.models import RepoChats
 
+'''Query'''
+
+
+query = '''
+{
+    viewer {
+    repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER],
+                    ownerAffiliations:[OWNER, ORGANIZATION_MEMBER, COLLABORATOR]) {
+      totalCount
+      nodes{
+        name
+          owner {
+            login
+          }
+           collaborators {
+           nodes {
+             login
+           }
+          }
+        }
+      }
+   }
+}
+'''
+
+
 '''Class Based Views Section'''
 
 
@@ -41,9 +67,21 @@ class UserView(viewsets.ModelViewSet):
 
 
 class ProfileView(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
+    # permission_classes = (AllowAny,)
     serializer_class = ProfileSerializer
     queryset = MergeProfile.objects.all()
+
+    # def post(self, request):
+    #     username = request.data['user']
+    #     merge_username = request.data['merge_username']
+    #     merge_password = request.data['merge_password']
+    #     user = User.objects.get(username=username)
+    #     profile = MergeProfile()
+    #     profile.user = user
+    #     profile.merge_username = merge_username
+    #     profile.merge_password = make_password(merge_password)
+    #     profile.save()
+    #     return Response(profile)
 
     def put(self, request, pk, format=None):
         profile = self.get_object(pk)
@@ -71,6 +109,7 @@ def get_oauthtoken(request):
     username = request.data['username']
     user = User.objects.get(username=username)
     result = SocialToken.objects.filter(account__user=user, account__provider="github")
+    user.save()
     return result.first()
 
 
@@ -98,27 +137,6 @@ def get_user(request):
 def get_user_repos(request):
     token = get_oauthtoken(request)
     headers = {'Authorization': 'token ' + str(token)}
-    query = '''
-    {
-        viewer {
-        repositories(first: 100, affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER],
-                        ownerAffiliations:[OWNER, ORGANIZATION_MEMBER, COLLABORATOR]) {
-          totalCount
-          nodes{
-            name
-              owner {
-                login
-              }
-               collaborators {
-               nodes {
-                 login
-               }
-              }
-            }
-          }
-       }
-    }
-    '''
     req = run_query(query=query, headers=headers)
     return Response(json.dumps(req))
 
@@ -135,7 +153,11 @@ def create_repo(request):
     chat.repo_name = repo_name
     chat.collaborators = collaborators
     chat.save()
-    return Response(json.dumps(json.loads(req.text)))
+    user = User.objects.get(username=request.data['username'])
+    user.save()
+    response = run_query(query=query, headers=headers)
+    return Response(json.dumps(response))
+    # return Response(json.dumps(json.loads(req.text)))
 
 
 @api_view(['POST', ])
@@ -145,4 +167,23 @@ def delete_repo(request):
     repo_name = request.data['repo_name']
     headers = {'Authorization': 'token ' + str(token)}
     req = requests.delete(f"https://api.github.com/repos/{username}/{repo_name}", headers=headers)
-    return Response(req)
+    instance = RepoChats.objects.get(repo_name=repo_name)
+    instance.delete()
+    return Response("Repo deleted")
+
+
+@api_view(['POST', ])
+def change_password(request):
+    username = request.data['username']
+    old_password = request.data['old_pwd']
+    new_password = request.data['new_pwd']
+    user = User.objects.get(username=username)
+    merge_user = MergeProfile.objects.get(user=user)
+    if user.check_password(old_password):
+        merge_user.merge_password = make_password(new_password)
+        merge_user.save()
+        user.save()
+        return Response('Password Changed')
+    else:
+        user.save()
+        return Response('Incorrect Password')
